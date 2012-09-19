@@ -51,11 +51,11 @@ Puppet Configuration
 
 Network Configuration
 ---------------------
-I'm attempting to write proper templates and logic to help configure networking in Debian and Ubuntu better. This basically amount to some `if` and `for` loops to build the `/etc/network/interfaces` file.
-
-Right now, you can configure one or more unbonded network interfaces. It is important to note that if the network interface IS your primary outgoing interface, mark it as MANAGEMENT. Otherwise more than one interface will get your default gateway and networking will not start due to errors.
+I have modified the Cobbler network config scripts to allow advanced Ubuntu network configuration such as bonding and vlans. I'll add some examples soon.
 
 This code is in the `snippets/ubuntu_late_command*` files.
+
+It is important to note that if the network interface IS your primary outgoing interface, mark it as MANAGEMENT. Otherwise more than one interface will get your default gateway and networking will not start due to errors.
 
 Seed Descriptions
 -----------------
