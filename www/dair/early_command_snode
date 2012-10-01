@@ -1,0 +1,164 @@
+#!/bin/sh
+
+case "$1" in
+
+installer)
+
+# we should have d-i downloaded by now.
+# partman comes in a udeb from the network so we have to hook here
+# and replace the partman-base.postinst file
+sed -i 's/partman/\/tmp\/early_command partman/' /var/lib/dpkg/info/partman-base.postinst
+logger early_command modified partman-base.postinst
+;;
+
+partman)
+
+# do filesystem stuff: detect our config, fdisk, lvm, raid, mount /target
+logger server-farm.early_command partition configuration starting
+
+
+# Downloading parted, partprobe, and necessary libraries
+mkdir /tmp/setup
+cd /tmp/setup
+wget http://192.168.255.1/setup.tar
+tar xf setup.tar
+export PATH=$PATH:/tmp/setup
+export LD_LIBRARY_PATH=/tmp/setup/lib
+
+# Using parted to reset the partition table to MSDOS style on all thre hard drives
+parted --script /dev/sda mklabel gpt
+parted --script /dev/sdb mklabel gpt
+parted --script /dev/sda mklabel msdos
+parted --script /dev/sdb mklabel msdos
+
+# Partition info:
+# sda1 /boot 512mb (raid autodetect)
+# sda2 swap 4096 (raid autodetect)
+# sda3 / rest (raid autodetect)
+# Sending commands that are normally interactive to fdisk
+for i in sda sdb 
+do
+echo "
+n
+p
+1
+
++300M
+a
+1
+n
+p
+2
+
++20480M
+n
+e
+
+
+
+n
+l
+5
+
++20480M
+n
+l
+
+t
+1
+fd
+t
+2
+82
+t
+5
+fd
+t
+6
+83
+w
+" | fdisk /dev/$i
+done
+
+# Using partprobe to re-read partition table of all three hard drives
+partprobe /dev/sda
+partprobe /dev/sdb
+
+# Cleaning partitions 
+# Wiping software raid superblock
+for i in sda sdb 
+do
+dd if=/dev/zero of=/dev/${i}1 bs=1M count=10
+dd if=/dev/zero of=/dev/${i}2 bs=1M count=10
+dd if=/dev/zero of=/dev/${i}5 bs=1M count=10
+
+mdadm --zero-superblock /dev/${i}1
+mdadm --zero-superblock /dev/${i}2
+mdadm --zero-superblock /dev/${i}5
+done
+
+# Loading raid modules
+modprobe raid1
+modprobe raid0
+modprobe raid10
+
+# Creating /boot raid1
+mdadm -C /dev/md0 -n 2 -l raid1 --metadata=0.90 /dev/sda1 /dev/sdb1
+
+# Creating / raid1
+mdadm -C /dev/md1 -n 2 -l raid1 /dev/sda5 /dev/sdb5 
+
+# Formatting /boot
+mkfs.xfs /dev/md0
+
+# Formatting /
+mkfs.xfs /dev/md1
+
+# Formatting swap
+mkswap /dev/sda2
+mkswap /dev/sdb2
+
+# Format swift drives
+mkfs.xfs /dev/sda6
+mkfs.xfs /dev/sdb6
+mkfs.xfs /dev/sdc
+mkfs.xfs /dev/sdd
+mkfs.xfs /dev/sde
+mkfs.xfs /dev/sdf
+
+# Mounting filesystems
+mkdir /target
+mount /dev/md1 /target -t xfs
+mkdir /target/boot
+mount /dev/md0 /target/boot -t xfs
+
+# Make swift mount points
+mkdir -p /target/srv/node
+mkdir /target/srv/node/sda6
+mkdir /target/srv/node/sdb6
+mkdir /target/srv/node/sdc
+mkdir /target/srv/node/sdd
+mkdir /target/srv/node/sde
+mkdir /target/srv/node/sdf
+
+# Creating fstab
+mkdir /target/etc
+echo \# /etc/fstab: static file system information. > /target/etc/fstab
+echo \# >> /target/etc/fstab
+echo proc                /proc           proc    nodev,noexec,nosuid 0 0 >> /target/etc/fstab
+echo /dev/md1            /               ext4    errors=remount-ro   0 1 >> /target/etc/fstab
+echo /dev/md0            /boot           ext4    defaults            1 2 >> /target/etc/fstab
+echo /dev/sda2           none            swap    sw                  0 0 >> /target/etc/fstab
+echo /dev/sdb2           none            swap    sw                  0 0 >> /target/etc/fstab
+echo /dev/sda6           /srv/node/sda6  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab
+echo /dev/sdb6           /srv/node/sdb6  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab
+echo /dev/sdc           /srv/node/sdc  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab
+echo /dev/sdd           /srv/node/sdd  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab
+echo /dev/sde           /srv/node/sde  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab
+echo /dev/sdf           /srv/node/sdf  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab
+
+ ;;
+
+*)
+
+  echo $0: This script is destructive and should only be run as part of the debian-installer process ;;esac
