@@ -28,32 +28,37 @@ export LD_LIBRARY_PATH=/tmp/setup/lib
 # Using parted to reset the partition table to MSDOS style on all thre hard drives
 parted --script /dev/sda mklabel gpt
 parted --script /dev/sdb mklabel gpt
-#parted --script /dev/sdc mklabel gpt
+parted --script /dev/sdc mklabel gpt
+parted --script /dev/sdd mklabel gpt
+parted --script /dev/sde mklabel gpt
+parted --script /dev/sdf mklabel gpt
 parted --script /dev/sda mklabel msdos
 parted --script /dev/sdb mklabel msdos
-#parted --script /dev/sdc mklabel msdos
+parted --script /dev/sdc mklabel msdos
+parted --script /dev/sdd mklabel msdos
+parted --script /dev/sde mklabel msdos
+parted --script /dev/sdf mklabel msdos
 
-# Partitions:
-# sda1 512mb /boot (raid autodetect)
-# sda2 1024 swap
-# sda5 2048 / (raid autodetect)
-# sd6 rest nova-volumes lvm (raid autodetect)
+# Partition info:
+# sda1 /boot 512mb (raid autodetect)
+# sda2 swap 4096 (raid autodetect)
+# sda3 / rest (raid autodetect)
 # Sending commands that are normally interactive to fdisk
-for i in sda sdb
+for i in sda sdb sdc sdd sde sdf
 do
 echo "
 n
 p
 1
 
-+512M
++300M
 a
 1
 n
 p
 2
 
-+1024M
++20480M
 n
 e
 
@@ -62,23 +67,27 @@ e
 n
 l
 
-+2048M
-n
-l
-
 
 t
 1
 fd
 t
 2
-82
+fd
 t
 5
 fd
+w
+" | fdisk /dev/$i
+done
+
+# Go back and add swap
+for i in sde sdf
+do
+echo "
 t
-6
-fd
+2
+82
 w
 " | fdisk /dev/$i
 done
@@ -86,41 +95,37 @@ done
 # Using partprobe to re-read partition table of all three hard drives
 partprobe /dev/sda
 partprobe /dev/sdb
-#partprobe /dev/sdc
+partprobe /dev/sdc
+partprobe /dev/sdd
+partprobe /dev/sde
+partprobe /dev/sdf
 
-# Loading raid1 module
-modprobe raid1
-
-# Cleaning partitions of lvm
-dd if=/dev/zero of=/dev/sda1 bs=1M count=10
-dd if=/dev/zero of=/dev/sdb1 bs=1M count=10
-
+# Cleaning partitions 
 # Wiping software raid superblock
-mdadm --zero-superblock /dev/sda1
-mdadm --zero-superblock /dev/sdb1
+for i in sda sdb sdc sdd sde sdf
+do
+dd if=/dev/zero of=/dev/${i}1 bs=1M count=10
+dd if=/dev/zero of=/dev/${i}2 bs=1M count=10
+dd if=/dev/zero of=/dev/${i}5 bs=1M count=10
+
+mdadm --zero-superblock /dev/${i}1
+mdadm --zero-superblock /dev/${i}2
+mdadm --zero-superblock /dev/${i}5
+done
+
+# Loading raid modules
+modprobe raid1
+modprobe raid0
+modprobe raid10
 
 # Creating /boot raid1
 mdadm -C /dev/md0 -n 2 -l raid1 --metadata=0.90 /dev/sda1 /dev/sdb1
 
-# Cleaning partitions of lvm
-dd if=/dev/zero of=/dev/sda2 bs=1M count=10
-dd if=/dev/zero of=/dev/sdb2 bs=1M count=10
-dd if=/dev/zero of=/dev/sda5 bs=1M count=10
-dd if=/dev/zero of=/dev/sdb5 bs=1M count=10
-dd if=/dev/zero of=/dev/sda6 bs=1M count=10
-dd if=/dev/zero of=/dev/sdb6 bs=1M count=10
-
-# Wiping software raid superblock
-mdadm --zero-superblock /dev/sda5
-mdadm --zero-superblock /dev/sdb5
-mdadm --zero-superblock /dev/sda6
-mdadm --zero-superblock /dev/sdb6
-
 # Creating / raid1
-mdadm -C /dev/md1 -n 2 -l raid1 --metadata=0.90 /dev/sda5 /dev/sdb5
+mdadm -C /dev/md1 -n 4 -l raid10 /dev/sda2 /dev/sdb2 /dev/sdc2 /dev/sdd2
 
-# Creating nova-volumes raid1
-mdadm -C /dev/md2 -n 2 -l raid1 --metadata=0.90 /dev/sda6 /dev/sdb6
+# Creating nova-volumes partition
+mdadm -C /dev/md2 -n 6 -l raid10 /dev/sda5 /dev/sdb5 /dev/sdc5 /dev/sdd5 /dev/sde5 /dev/sdf5
 
 # Formatting /boot
 mkfs.ext4 /dev/md0
@@ -128,18 +133,29 @@ mkfs.ext4 /dev/md0
 # Formatting /
 mkfs.ext4 /dev/md1
 
+# Formatting /dev/md2
+mkfs.ext4 /dev/md2
+
 # Formatting swap
-mkswap /dev/sda2
+mkswap /dev/sde2
+mkswap /dev/sdf2
 
 # Creating pvgroup / vggroup
 pvcreate /dev/md2
 vgcreate nova-volumes /dev/md2
+
+# Create a lv for nova-instances
+lvcreate -L 500G -n nova-instances nova-volumes
+mkfs.ext4 /dev/mapper/nova--volumes-nova--instances
 
 # Mounting filesystems
 mkdir /target
 mount /dev/md1 /target -t ext4
 mkdir /target/boot
 mount /dev/md0 /target/boot -t ext4
+
+# Make the dir for nova-instances
+mkdir -p /target/var/lib/nova/instances
 
 # Creating fstab
 mkdir /target/etc
@@ -148,7 +164,9 @@ echo \# >> /target/etc/fstab
 echo proc                /proc           proc    nodev,noexec,nosuid 0 0 >> /target/etc/fstab
 echo /dev/md1            /               ext4    errors=remount-ro   0 1 >> /target/etc/fstab
 echo /dev/md0            /boot           ext4    defaults            1 2 >> /target/etc/fstab
-echo /dev/sda2           none            swap    sw                  0 0 >> /target/etc/fstab
+echo /dev/sde2           none            swap    sw                  0 0 >> /target/etc/fstab
+echo /dev/sdf2           none            swap    sw                  0 0 >> /target/etc/fstab
+echo /dev/mapper/nova--volumes-nova--instances /var/lib/nova/instances ext4 defaults 0 0 >> /target/etc/fstab
 
  ;;
 

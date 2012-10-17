@@ -16,7 +16,7 @@
     "mtime": 1339789986.125976,
     "template_files": {},
     "gateway": "192.168.2.10",
-    "uid": "MTMzNzI4ODk2MC4wNTQxODAyMzcuMDUzOTc",
+    "uid": "MTMzNzI4ODk2MC4wNTQxODAyMzcuMDUzOTr",
     "virt_auto_boot": 0,
     "power_type": "ether_wake",
     "virt_cpus": "<<inherit>>",
