@@ -6,6 +6,7 @@ Directory Contents
 * kickstarts: contents go in `/var/lib/cobbler/kickstarts`
 * snippets: contents go in `/var/lib/cobbler/snippets`
 * www: contents go in `/var/www`
+* config: contents go in `/var/lib/cobbler/config`
 
 Basic Cobbler Installation
 --------------------------
@@ -65,4 +66,4 @@ The first hack is the `early_command` hack. Debian/Ubuntu preseeding is horrible
 
 The second hack is to apply the static network configuration after the install is done. See the Network Configuration section for more details on this.
 
-The third hack is described in Ubuntu Configuration regarding multiple NICs.
+The third hack is described in Network Configuration regarding multiple NICs.
