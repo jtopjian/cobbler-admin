@@ -5,6 +5,7 @@
 #set profile_name = $getVar('profile_name','')
 #set puppet =  $str($getVar('puppet_auto_setup',''))
 #set hostname = $getVar('$hostname', None)
+#set comment = $str($getVar('comment',''))
 
 #set int_file_head = "auto lo\\niface lo inet loopback\\n\\n"
 #set int_file = ""
@@ -108,5 +109,11 @@
         #set puppet_install = "echo 1"
     #end if
 
-d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $runpost;
+    #if $comment
+      #set location = "mkdir -p /etc/facter/facts.d; echo location=%s > /etc/facter/facts.d/location.txt" % $comment
+    #else
+      #set location = ""
+    #end if
+
+d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $runpost;
 #end if
