@@ -110,10 +110,12 @@
     #end if
 
     #if $comment
-      #set location = "mkdir -p /etc/facter/facts.d; echo location=%s > /etc/facter/facts.d/location.txt" % $comment
+      #set location = "in-target mkdir -p /etc/facter/facts.d; in-target echo location=%s > /etc/facter/facts.d/location.txt" % $comment
     #else
       #set location = ""
     #end if
 
-d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $runpost;
+    #set folsom = "in-target apt-get install -y ubuntu-cloud-keyring; in-target wget http://%s/folsom.list -O /etc/apt/sources.list.d/folsom.list" % (srv)
+
+d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $folsom; $runpost;
 #end if
