@@ -49,6 +49,7 @@ Puppet Configuration
 	* This triggers the Puppet setup in `snippets/ubuntu_late_command`
 * Create a Puppet Master server (could be the same as the cobbler server).
 * Edit `www/puppet.*` to suit your environment's needs.
+* Create `www/location.txt` with contents of `location=ua` or `location=us` depending on location.
 
 Network Configuration
 ---------------------

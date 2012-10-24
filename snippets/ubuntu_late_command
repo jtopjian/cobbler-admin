@@ -90,7 +90,7 @@
             #set hosts += "ff02::1 ip6-allnodes\\n"
             #set hosts += "ff02::2 ip6-allrouters\\n"
             #set static_command += "; echo -e \"%s\" > /target/etc/hosts" % (hosts)
-            #set static_command += "; echo -e \"%s\" > /target/etc/hostname" % (hosts)
+            #set static_command += "; echo -e \"%s\" > /target/etc/hostname" % (hostname)
         #end if
     #else
         #set static_command = "echo 1"
@@ -109,13 +109,9 @@
         #set puppet_install = "echo 1"
     #end if
 
-    #if $comment
-      #set location = "in-target mkdir -p /etc/facter/facts.d; in-target echo location=%s > /etc/facter/facts.d/location.txt" % $comment
-    #else
-      #set location = ""
-    #end if
+    #set location = "in-target mkdir -p /etc/facter/facts.d; in-target wget http://%s/location.txt -O /etc/facter/facts.d/location.txt" % (srv)
 
-    #set folsom = "in-target apt-get install -y ubuntu-cloud-keyring; in-target wget http://%s/folsom.list -O /etc/apt/sources.list.d/folsom.list" % (srv)
+    #set folsom = "in-target apt-get install -y ubuntu-cloud-keyring; in-target wget http://%s/folsom.list -O /etc/apt/sources.list.d/folsom.list; in-target apt-get update" % (srv)
 
 d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $folsom; $runpost;
 #end if
