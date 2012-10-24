@@ -25,6 +25,7 @@ Basic Cobbler Installation
 * `cobbler distro list` 
 * Install apt-cacher:
     * `apt-get install apt-cacher-ng`
+* Edit `www/01apt-cacher-ng-proxy` with the hostname of the `util` server.
 
 Ubuntu Configuration
 --------------------
