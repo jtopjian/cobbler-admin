@@ -111,7 +111,9 @@
 
     #set location = "in-target mkdir -p /etc/facter/facts.d; in-target wget http://%s/location.txt -O /etc/facter/facts.d/location.txt" % (srv)
 
+    #set aptcache = "in-target wget http://%s/01apt-cacher-ng-proxy -O /etc/apt/apt.conf.d/01apt-cacher-ng-proxy; in-target wget http://%s/sources.list -O /etc/apt/sources.list; in-target apt-get update" % (srv,srv)
+
     #set folsom = "in-target apt-get install -y ubuntu-cloud-keyring; in-target wget http://%s/folsom.list -O /etc/apt/sources.list.d/folsom.list; in-target apt-get update" % (srv)
 
-d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $folsom; $runpost;
+d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $aptcache; $folsom; $runpost;
 #end if
