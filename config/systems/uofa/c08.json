@@ -11,7 +11,7 @@
     "power_user": "",
     "kernel_options": {},
     "name_servers": [
-        "192.168.1.1"
+        "192.168.22.235"
     ],
     "mtime": 1339789986.125976,
     "template_files": {},
@@ -22,7 +22,7 @@
     "virt_cpus": "<<inherit>>",
     "mgmt_parameters": "<<inherit>>",
     "boot_files": {},
-    "hostname": "dair-ua-c08.private.dair-atir.canarie.ca",
+    "hostname": "dair-ua-c08.dair-atir.canarie.ca",
     "repos_enabled": false,
     "mgmt_classes": [],
     "power_pass": "",
@@ -64,7 +64,7 @@
             "subnet": "",
             "management": true,
             "interface_master": "",
-            "mac_address": "00:16:3e:40:df:13",
+            "mac_address": "00:16:3e:40:df:18",
             "virt_bridge": "virbr0",
             "bonding": "",
             "bonding_opts": "",
@@ -73,13 +73,13 @@
             "ipv6_mtu": "",
             "static_routes": [],
             "ipv6_static_routes": [],
-            "dns_name": "dair-ua-c08.private.dair-atir.canarie.ca",
+            "dns_name": "dair-ua-c08.dair-atir.canarie.ca",
             "netmask": "255.255.255.0",
             "mtu": "",
             "ipv6_secondaries": [],
             "ipv6_default_gateway": ""
         },
-        "eth3": {
+        "eth1": {
             "ipv6_address": "",
             "interface_type": "bond_slave",
             "static": false,
@@ -103,7 +103,7 @@
             "ipv6_secondaries": [],
             "ipv6_default_gateway": ""
         },
-        "eth2": {
+        "eth3": {
             "ipv6_address": "",
             "interface_type": "bond_slave",
             "static": false,
@@ -140,7 +140,7 @@
             "virt_bridge": "virbr0",
             "bonding": "",
             "bonding_opts": "",
-            "ip_address": "192.168.254.18",
+            "ip_address": "192.168.22.18",
             "dhcp_tag": "",
             "ipv6_mtu": "",
             "static_routes": [],

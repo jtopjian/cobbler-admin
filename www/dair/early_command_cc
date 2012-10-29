@@ -20,10 +20,31 @@ logger server-farm.early_command partition configuration starting
 # Downloading parted, partprobe, and necessary libraries
 mkdir /tmp/setup
 cd /tmp/setup
-wget http://192.168.255.1/setup.tar
+wget http://192.168.4.235/setup.tar
 tar xf setup.tar
 export PATH=$PATH:/tmp/setup
 export LD_LIBRARY_PATH=/tmp/setup/lib
+
+# Stop all arrays
+for i in `cat /proc/mdstat | grep ^md | cut -d" " -f1`
+do
+    mdadm --stop --force /dev/$i
+done
+
+# Cleaning partitions 
+# Wiping software raid superblock
+for i in sda sdb sdc sdd
+do
+mdadm --zero-superblock  /dev/${i}1
+mdadm --zero-superblock  /dev/${i}2
+mdadm --zero-superblock  /dev/${i}5
+done
+
+# blank the drives table of contents
+for i in sda sdb sdc sdd
+do
+   dd if=/dev/zero of=$i bs=446 count=1
+done
 
 # Using parted to reset the partition table to MSDOS style on all thre hard drives
 parted --script /dev/sda mklabel gpt
@@ -37,8 +58,8 @@ parted --script /dev/sdd mklabel msdos
 
 # Partition info:
 # sda1 /boot 512mb (raid autodetect)
-# sda2 swap 4096 (raid autodetect)
-# sda3 / rest (raid autodetect)
+# sda2 swap 20G (raid autodetect)
+# sda5 / rest (raid autodetect)
 # Sending commands that are normally interactive to fdisk
 for i in sda sdb sdc sdd
 do
@@ -47,7 +68,7 @@ n
 p
 1
 
-+300M
++512M
 a
 1
 n
@@ -78,34 +99,21 @@ w
 done
 
 # Go back and add swap
-for i in sdc sdd
-do
-echo "
-t
-2
-82
-w
-" | fdisk /dev/$i
-done
+#for i in sdc sdd
+#do
+#echo "
+#t
+#2
+#82
+#w
+#" | fdisk /dev/$i
+#done
 
 # Using partprobe to re-read partition table of all three hard drives
-partprobe /dev/sda
-partprobe /dev/sdb
-partprobe /dev/sdc
-partprobe /dev/sdd
-
-# Cleaning partitions 
-# Wiping software raid superblock
-for i in sda sdb sdc sdd
-do
-dd if=/dev/zero of=/dev/${i}1 bs=1M count=10
-dd if=/dev/zero of=/dev/${i}2 bs=1M count=10
-dd if=/dev/zero of=/dev/${i}5 bs=1M count=10
-
-mdadm --zero-superblock /dev/${i}1
-mdadm --zero-superblock /dev/${i}2
-mdadm --zero-superblock /dev/${i}5
-done
+partprobe -s /dev/sda
+partprobe -s /dev/sdb
+partprobe -s /dev/sdc
+partprobe -s /dev/sdd
 
 # Loading raid modules
 modprobe raid1
@@ -113,13 +121,16 @@ modprobe raid0
 modprobe raid10
 
 # Creating /boot raid1
-mdadm -C /dev/md0 -n 2 -l raid1 --metadata=0.90 /dev/sda1 /dev/sdb1
+echo y | mdadm -C /dev/md0 -n 2 -l raid1 --metadata=0.90 /dev/sda1 /dev/sdb1
 
 # Creating spare raid1
-mdadm -C /dev/md1 -n 4 -l raid1 /dev/sda2 /dev/sdb2 
+echo y | mdadm -C /dev/md1 -n 2 -l raid1 --metadata=default /dev/sda2 /dev/sdb2 
 
 # Creating / raid10
-mdadm -C /dev/md2 -n 6 -l raid10 /dev/sda5 /dev/sdb5 /dev/sdc5 /dev/sdd5 
+echo y | mdadm -C /dev/md2 -n 4 -l raid10 --metadata=default /dev/sda5 /dev/sdb5 /dev/sdc5 /dev/sdd5 
+
+# Creating swap
+echo y | mdadm -C /dev/md3 -n 2 -l raid1 --metadata=default /dev/sdc2 /dev/sdd2
 
 # Formatting /boot
 mkfs.ext4 /dev/md0
@@ -131,8 +142,7 @@ mkfs.ext4 /dev/md1
 mkfs.ext4 /dev/md2
 
 # Formatting swap
-mkswap /dev/sdc2
-mkswap /dev/sdd2
+mkswap /dev/md3
 
 # Mounting filesystems
 mkdir /target
@@ -147,8 +157,7 @@ echo \# >> /target/etc/fstab
 echo proc                /proc           proc    nodev,noexec,nosuid 0 0 >> /target/etc/fstab
 echo /dev/md2            /               ext4    errors=remount-ro   0 1 >> /target/etc/fstab
 echo /dev/md0            /boot           ext4    defaults            1 2 >> /target/etc/fstab
-echo /dev/sdc2           none            swap    sw                  0 0 >> /target/etc/fstab
-echo /dev/sdd2           none            swap    sw                  0 0 >> /target/etc/fstab
+echo /dev/md3            none            swap    sw                  0 0 >> /target/etc/fstab
 
  ;;
 

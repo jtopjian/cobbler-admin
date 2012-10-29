@@ -20,21 +20,51 @@ logger server-farm.early_command partition configuration starting
 # Downloading parted, partprobe, and necessary libraries
 mkdir /tmp/setup
 cd /tmp/setup
-wget http://192.168.255.1/setup.tar
+wget http://192.168.4.235/setup.tar
 tar xf setup.tar
 export PATH=$PATH:/tmp/setup
 export LD_LIBRARY_PATH=/tmp/setup/lib
 
+# Stop all arrays
+for i in `cat /proc/mdstat | grep ^md | cut -d" " -f1`
+do
+    mdadm --stop --force /dev/$i
+done
+
+# Cleaning partitions 
+# Wiping software raid superblock
+for i in sda sdb 
+do
+mdadm --zero-superblock  /dev/${i}1
+mdadm --zero-superblock  /dev/${i}2
+mdadm --zero-superblock  /dev/${i}5
+done
+
+# Clear partition table
+for i in sda sdb
+do
+    dd if=/dev/zero of=/dev/$i bs=446 count=1
+done
+
 # Using parted to reset the partition table to MSDOS style on all thre hard drives
 parted --script /dev/sda mklabel gpt
 parted --script /dev/sdb mklabel gpt
+parted --script /dev/sdc mklabel gpt
+parted --script /dev/sdd mklabel gpt
+parted --script /dev/sde mklabel gpt
+parted --script /dev/sdf mklabel gpt
 parted --script /dev/sda mklabel msdos
 parted --script /dev/sdb mklabel msdos
+parted --script /dev/sdc mklabel msdos
+parted --script /dev/sdd mklabel msdos
+parted --script /dev/sde mklabel msdos
+parted --script /dev/sdf mklabel msdos
 
 # Partition info:
 # sda1 /boot 512mb (raid autodetect)
-# sda2 swap 4096 (raid autodetect)
-# sda3 / rest (raid autodetect)
+# sda2 swap 20G (raid autodetect)
+# sda5 / 20G (raid autodetect)
+# sda6 swift rest
 # Sending commands that are normally interactive to fdisk
 for i in sda sdb 
 do
@@ -43,7 +73,7 @@ n
 p
 1
 
-+300M
++512M
 a
 1
 n
@@ -58,18 +88,18 @@ e
 
 n
 l
-5
 
 +20480M
 n
 l
+
 
 t
 1
 fd
 t
 2
-82
+fd
 t
 5
 fd
@@ -81,21 +111,8 @@ w
 done
 
 # Using partprobe to re-read partition table of all three hard drives
-partprobe /dev/sda
-partprobe /dev/sdb
-
-# Cleaning partitions 
-# Wiping software raid superblock
-for i in sda sdb 
-do
-dd if=/dev/zero of=/dev/${i}1 bs=1M count=10
-dd if=/dev/zero of=/dev/${i}2 bs=1M count=10
-dd if=/dev/zero of=/dev/${i}5 bs=1M count=10
-
-mdadm --zero-superblock /dev/${i}1
-mdadm --zero-superblock /dev/${i}2
-mdadm --zero-superblock /dev/${i}5
-done
+partprobe -s /dev/sda
+partprobe -s /dev/sdb
 
 # Loading raid modules
 modprobe raid1
@@ -103,34 +120,36 @@ modprobe raid0
 modprobe raid10
 
 # Creating /boot raid1
-mdadm -C /dev/md0 -n 2 -l raid1 --metadata=0.90 /dev/sda1 /dev/sdb1
+echo y | mdadm -C /dev/md0 -n 2 -l raid1 --metadata=0.90 /dev/sda1 /dev/sdb1
 
 # Creating / raid1
-mdadm -C /dev/md1 -n 2 -l raid1 /dev/sda5 /dev/sdb5 
+echo y | mdadm -C /dev/md1 -n 2 -l raid1 --metadata=default /dev/sda2 /dev/sdb2 
+
+# Creating swap
+echo y | mdadm -C /dev/md2 -n 2 -l raid1 --metadata=default /dev/sda5 /dev/sdb5
 
 # Formatting /boot
-mkfs.xfs /dev/md0
+mkfs.ext4 -F /dev/md0
 
 # Formatting /
-mkfs.xfs /dev/md1
+mkfs.ext4 -F /dev/md1
 
 # Formatting swap
-mkswap /dev/sda2
-mkswap /dev/sdb2
+mkswap /dev/md2
 
 # Format swift drives
-mkfs.xfs /dev/sda6
-mkfs.xfs /dev/sdb6
-mkfs.xfs /dev/sdc
-mkfs.xfs /dev/sdd
-mkfs.xfs /dev/sde
-mkfs.xfs /dev/sdf
+mkfs.xfs -f /dev/sda6
+mkfs.xfs -f /dev/sdb6
+mkfs.xfs -f /dev/sdc
+mkfs.xfs -f /dev/sdd
+mkfs.xfs -f /dev/sde
+mkfs.xfs -f /dev/sdf
 
 # Mounting filesystems
 mkdir /target
-mount /dev/md1 /target -t xfs
+mount /dev/md1 /target -t ext4
 mkdir /target/boot
-mount /dev/md0 /target/boot -t xfs
+mount /dev/md0 /target/boot -t ext4
 
 # Make swift mount points
 mkdir -p /target/srv/node
@@ -146,10 +165,9 @@ mkdir /target/etc
 echo \# /etc/fstab: static file system information. > /target/etc/fstab
 echo \# >> /target/etc/fstab
 echo proc                /proc           proc    nodev,noexec,nosuid 0 0 >> /target/etc/fstab
-echo /dev/md1            /               ext4    errors=remount-ro   0 1 >> /target/etc/fstab
 echo /dev/md0            /boot           ext4    defaults            1 2 >> /target/etc/fstab
-echo /dev/sda2           none            swap    sw                  0 0 >> /target/etc/fstab
-echo /dev/sdb2           none            swap    sw                  0 0 >> /target/etc/fstab
+echo /dev/md1            /               ext4    errors=remount-ro   0 1 >> /target/etc/fstab
+echo /dev/md2            none            swap    sw                  0 0 >> /target/etc/fstab
 echo /dev/sda6           /srv/node/sda6  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab
 echo /dev/sdb6           /srv/node/sdb6  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab
 echo /dev/sdc           /srv/node/sdc  xfs     noatime,nodiratime,nobarrier,logbufs=8 0 0 >> /target/etc/fstab

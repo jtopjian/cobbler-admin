@@ -11,18 +11,18 @@
     "power_user": "",
     "kernel_options": {},
     "name_servers": [
-        "192.168.1.1"
+        "192.168.4.235"
     ],
     "mtime": 1339789986.125976,
     "template_files": {},
-    "gateway": "192.168.1.10",
+    "gateway": "192.168.44.10",
     "uid": "MTMzNzI4ODk2MC4wNTQxODAyMzcuMDUzOTu",
     "virt_auto_boot": 0,
     "power_type": "ether_wake",
     "virt_cpus": "<<inherit>>",
     "mgmt_parameters": "<<inherit>>",
     "boot_files": {},
-    "hostname": "dair-us-s03.private.dair-atir.canarie.ca",
+    "hostname": "dair-us-s03.dair-atir.canarie.ca",
     "repos_enabled": false,
     "mgmt_classes": [],
     "power_pass": "",
@@ -64,22 +64,22 @@
             "subnet": "",
             "management": true,
             "interface_master": "",
-            "mac_address": "00:16:3e:40:df:13",
+            "mac_address": "00:16:3e:40:df:29",
             "virt_bridge": "virbr0",
             "bonding": "",
             "bonding_opts": "",
-            "ip_address": "192.168.1.246",
+            "ip_address": "192.168.44.246",
             "dhcp_tag": "",
             "ipv6_mtu": "",
             "static_routes": [],
             "ipv6_static_routes": [],
-            "dns_name": "dair-us-s03.private.dair-atir.canarie.ca",
+            "dns_name": "dair-us-s03.dair-atir.canarie.ca",
             "netmask": "255.255.255.0",
             "mtu": "",
             "ipv6_secondaries": [],
             "ipv6_default_gateway": ""
         },
-        "eth3": {
+        "eth1": {
             "ipv6_address": "",
             "interface_type": "bond_slave",
             "static": false,
@@ -103,7 +103,7 @@
             "ipv6_secondaries": [],
             "ipv6_default_gateway": ""
         },
-        "eth2": {
+        "eth3": {
             "ipv6_address": "",
             "interface_type": "bond_slave",
             "static": false,
@@ -140,7 +140,7 @@
             "virt_bridge": "virbr0",
             "bonding": "",
             "bonding_opts": "",
-            "ip_address": "192.168.255.246",
+            "ip_address": "192.168.4.246",
             "dhcp_tag": "",
             "ipv6_mtu": "",
             "static_routes": [],

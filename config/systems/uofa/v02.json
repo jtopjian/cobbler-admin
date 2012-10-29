@@ -11,18 +11,18 @@
     "power_user": "",
     "kernel_options": {},
     "name_servers": [
-        "69.10.140.199"
+        "192.168.22.235"
     ],
     "mtime": 1339788282.83193,
     "template_files": {},
-    "gateway": "69.10.140.193",
-    "uid": "MTMzNzI4NjcyMC43NzM4NTMyMjkuMzY3",
+    "gateway": "208.75.74.1",
+    "uid": "MTMzNzI4NjcyMC43NzM4NTMyMjkuMzY5",
     "virt_auto_boot": 0,
     "power_type": "ether_wake",
     "virt_cpus": "<<inherit>>",
     "mgmt_parameters": "<<inherit>>",
     "boot_files": {},
-    "hostname": "dair-ua-v02.private.dair-atir.canarie.ca",
+    "hostname": "dair-ua-v02.dair-atir.canarie.ca",
     "repos_enabled": false,
     "mgmt_classes": [],
     "power_pass": "",
@@ -73,13 +73,13 @@
             "ipv6_mtu": "",
             "static_routes": [],
             "ipv6_static_routes": [],
-            "dns_name": "dair-ua-v02.private.dair-atir.canarie.ca",
+            "dns_name": "dair-ua-v02-private.dair-atir.canarie.ca",
             "netmask": "255.255.255.0",
             "mtu": "",
             "ipv6_secondaries": [],
             "ipv6_default_gateway": ""
         },
-        "eth3": {
+        "eth1": {
             "ipv6_address": "",
             "interface_type": "bond_slave",
             "static": false,
@@ -103,7 +103,7 @@
             "ipv6_secondaries": [],
             "ipv6_default_gateway": ""
         },
-        "eth2": {
+        "eth3": {
             "ipv6_address": "",
             "interface_type": "bond_slave",
             "static": false,
@@ -136,7 +136,7 @@
             "subnet": "",
             "management": true,
             "interface_master": "",
-            "mac_address": "00:16:3e:07:18:48",
+            "mac_address": "00:16:3e:07:18:51",
             "virt_bridge": "virbr0",
             "bonding": "",
             "bonding_opts": "",
@@ -160,11 +160,11 @@
             "subnet": "",
             "management": false,
             "interface_master": "",
-            "mac_address": "00:a0:d1:ec:7c:10",
+            "mac_address": "00:26:6c:f9:be:74",
             "virt_bridge": "virbr0",
             "netmask": "255.255.255.0",
             "bonding_opts": "",
-            "ip_address": "192.168.254.9",
+            "ip_address": "192.168.22.9",
             "dhcp_tag": "",
             "static_routes": [],
             "ipv6_mtu": "",
