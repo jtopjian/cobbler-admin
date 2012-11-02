@@ -11,6 +11,7 @@
 #set int_file = ""
 #set vlan_config = ""
 #set slave_config = ""
+#set udev = ""
 #set configure_static_networking = False
 #set ikeys = $interfaces.keys()
 
@@ -66,6 +67,12 @@
     #else
         #set int_file += tint_file
     #end if
+
+    #if iname in ['eth0', 'eth1', 'eth2', 'eth3']
+        #set udev += 'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="%s", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="%s"' % (mac, iname)
+        #set udev += "\n\n"
+    #end if
+
 #end for
 
 #set int_file = int_file_head + slave_config + int_file + vlan_config
@@ -92,6 +99,7 @@
             #set static_command += "; echo -e \"%s\" > /target/etc/hosts" % (hosts)
             #set static_command += "; echo -e \"%s\" > /target/etc/hostname" % (hostname)
         #end if
+        #set static_command += "; echo -e \"%s\" > /target/etc/udev/rules.d/70-persistent-net.rules" % (udev)
     #else
         #set static_command = "echo 1"
     #end if
@@ -104,18 +112,16 @@
     #end if
 
     #if $puppet in [ "1", "true", "yes", "y" ]
-        #set puppet_install = "in-target apt-get install -y puppet; in-target wget http://%s/puppet.conf -O /etc/puppet/puppet.conf; in-target wget http://%s/puppet.default -O /etc/default/puppet" % (srv, srv)
+        #set puppet_install = "in-target apt-get install -y puppet; in-target wget http://%s/config/puppet.conf -O /etc/puppet/puppet.conf; in-target wget http://%s/config/puppet.default -O /etc/default/puppet; in-target wget http://%s/config/rc.local -O /etc/rc.local" % (srv, srv, srv)
     #else
         #set puppet_install = "echo 1"
     #end if
 
-    #set location = "in-target mkdir -p /etc/facter/facts.d; in-target wget http://%s/location.txt -O /etc/facter/facts.d/location.txt" % (srv)
+    #set location = "in-target mkdir -p /etc/facter/facts.d; in-target wget http://%s/config/location.txt -O /etc/facter/facts.d/location.txt" % (srv)
 
-    #set aptcache = "in-target wget http://%s/01apt-cacher-ng-proxy -O /etc/apt/apt.conf.d/01apt-cacher-ng-proxy; in-target wget http://%s/sources.list -O /etc/apt/sources.list; in-target apt-get update" % (srv,srv)
+    #set aptcache = "in-target wget http://%s/config/01apt-cacher-ng-proxy -O /etc/apt/apt.conf.d/01apt-cacher-ng-proxy; in-target wget http://%s/config/sources.list -O /etc/apt/sources.list; in-target apt-get update" % (srv,srv)
 
-    #set folsom = "in-target apt-get install -y ubuntu-cloud-keyring; in-target wget http://%s/folsom.list -O /etc/apt/sources.list.d/folsom.list; in-target apt-get update" % (srv)
+    #set folsom = "in-target apt-get install -y ubuntu-cloud-keyring; in-target wget http://%s/config/folsom.list -O /etc/apt/sources.list.d/folsom.list; in-target apt-get update" % (srv)
 
-    #set udev = "cp /etc/udev/rules.d/70-* /target/etc/udev/rules.d/"
-
-d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $aptcache; $folsom; $udev; $runpost;
+d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $aptcache; $folsom; $runpost; 
 #end if

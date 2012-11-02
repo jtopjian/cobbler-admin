@@ -7,7 +7,7 @@
     #set gateway = $getVar('gateway','')
 #end if
 
-d-i preseed/early_command string cd /tmp; wget http://$srv/early_command_snode -O early_command; \
+d-i preseed/early_command string cd /tmp; wget http://$srv/dair/early_command_snode -O early_command; \
 	chmod 755 early_command; \
 	echo /tmp/early_command installer >> /var/lib/dpkg/info/download-installer.postinst;
 

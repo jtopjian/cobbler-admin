@@ -1,1 +1,0 @@
-Acquire::http { Proxy "http://util.ua.sandbox.cybera.ca:3142"; };
