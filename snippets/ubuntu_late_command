@@ -69,8 +69,8 @@
     #end if
 
     #if iname in ['eth0', 'eth1', 'eth2', 'eth3']
-        #set udev += 'SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="%s", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="%s"' % (mac, iname)
-        #set udev += "\n\n"
+        #set udev += 'SUBSYSTEM==\\"net\\", ACTION==\\"add\\", DRIVERS==\\"?*\\", ATTR{address}==\\"%s\\", ATTR{dev_id}==\\"0x0\\", ATTR{type}==\\"1\\", KERNEL==\\"eth*\\", NAME=\\"%s\\"' % (mac, iname)
+        #set udev += "\\n\\n"
     #end if
 
 #end for
