@@ -34,8 +34,8 @@ Ubuntu Configuration
     * Assign each role a seed file:
         * Included is `install-cc.seed` for Controller
         * `install-node.seed` for Compute
-    * For each role/profile, make sure you add the following kernel option:
-        * `netcfg/choose_interface=eth0 `
+    * For each distro/role/profile, make sure you add the following kernel option:
+        * `raid=noautodetect netcfg/choose_interface=em1 biosdevname=1`
         * If this is not specified, the installer will prompt you to choose a NIC when multiple NICs are available, thus breaking the hands-off installation.
 
 Ubuntu Deployment
@@ -49,16 +49,26 @@ Puppet Configuration
 * Make sure `puppet_auto_setup` is set to `1` in `/etc/cobbler/settings`.
 	* This triggers the Puppet setup in `snippets/ubuntu_late_command`
 * Create a Puppet Master server (could be the same as the cobbler server).
-* Edit `www/puppet.*` to suit your environment's needs.
-* Create `www/location.txt` with contents of `location=ua` or `location=us` depending on location.
+* Edit `www/config/puppet.*` to suit your environment's needs.
+* Create `www/config/location.txt` with contents of `location=ua` or `location=us` depending on location.
 
-Network Configuration
----------------------
+Network Configuration During Install
+------------------------------------
+`biosdevname=1` will rename NICs to be `em1`, `em2`, etc. This is because NICs have never been detected in a predicable order using Ubuntu 12.04 on any of the servers I have worked on.
+
+This is only for the installation. After installation, `biosdevname` is not used. This is because a few random servers will mix `emX` and `ethX` names.
+
+In your Cobbler configuration, make sure you specify the correct MAC address for each NIC. The `ubuntu_late_command` script will build a proper `udev` rule to match the MAC to the `ethX` device.
+
+Post-Install Network Configuration
+----------------------------------
 I have modified the Cobbler network config scripts to allow advanced Ubuntu network configuration such as bonding and vlans. I'll add some examples soon.
 
 This code is in the `snippets/ubuntu_late_command*` files.
 
 It is important to note that if the network interface IS your primary outgoing interface, mark it as MANAGEMENT. Otherwise more than one interface will get your default gateway and networking will not start due to errors.
+
+It is also important to note to ensure the MAC addresses are correct for each physical interface.
 
 Seed Descriptions
 -----------------

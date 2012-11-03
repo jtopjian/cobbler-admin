@@ -1,61 +1,11 @@
 #set srv = $getVar('http_server','')
-#if 'eth0' in $interfaces
-    #set idata = $interfaces['eth0']
-    #set static = $idata['static']
-    #set ip_address = $idata.get("ip_address", "")
-    #set netmask = $idata.get("netmask", "")
-    #set gateway = $getVar('gateway','')
-#end if
-
 d-i preseed/early_command string cd /tmp; wget http://$srv/dair/early_command_cc -O early_command; \
 	chmod 755 early_command; \
 	echo /tmp/early_command installer >> /var/lib/dpkg/info/download-installer.postinst;
 
-### Network configuration
-# Disable network configuration entirely. This is useful for cdrom
-# installations on non-networked devices where the network questions,
-# warning and long timeouts are a nuisance.
-# d-i netcfg/enable boolean false
+d-i netcfg/choose_interface select em1
 
-# netcfg will choose an interface that has link if possible. This makes it
-# skip displaying a list if there is more than one interface.
-# d-i netcfg/choose_interface select auto
-
-# To pick a particular interface instead:
-d-i netcfg/choose_interface select eth0
-
-# If you have a slow dhcp server and the installer times out waiting for
-# it, this might be useful.
-#if $static
-# d-i netcfg/dhcp_timeout string 60
-#else 
-d-i netcfg/dhcp_timeout string 60
-#end if
-
-# If you prefer to configure the network manually, uncomment this line and
-# the static network configuration below.
-#if $static
 d-i netcfg/disable_dhcp boolean true
-#else
-# d-i netcfg/disable_dhcp boolean true
-#end if
-
-#if $static
-# Static network configuration.
-d-i netcfg/get_nameservers string $name_servers[0] 
-d-i netcfg/get_ipaddress string $idata.get("ip_address", "")
-d-i netcfg/get_netmask string $idata.get("netmask", "")
-d-i netcfg/get_gateway string $gateway
-d-i netcfg/confirm_static boolean true
-#end if
-
-# Any hostname and domain names assigned from dhcp take precedence over
-# values set here. However, setting the values still prevents the questions
-# from being shown, even if values come from dhcp.
-#if $static
 d-i netcfg/get_hostname string $hostname
 d-i netcfg/get_domain string example.com
-#end if
-
-# Disable that annoying WEP key dialog.
 d-i netcfg/wireless_wep string
