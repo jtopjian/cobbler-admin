@@ -14,9 +14,17 @@ File.open('macs.txt').each do |line|
 
   f = File.open("../systems.d/#{host}.json").read()
   j = JSON.parse(f)
+  hostname = j['hostname']
+  h, *domain = hostname.split('.')
+  h1 = "#{h}-pxe.#{domain.join('.')}"
+  h2 = "#{h}-unused.#{domain.join('.')}"
   j['interfaces']['eth0']['mac_address'] = one
+  j['interfaces']['eth0']['dns_name'] = h1
   j['interfaces']['eth1'] = j['interfaces']['eth0'].dup
   j['interfaces']['eth1']['mac_address'] = inc_mac(one)
+  j['interfaces']['eth1']['static'] = false
+  j['interfaces']['eth1']['ip_address'] = ""
+  j['interfaces']['eth1']['dns_name'] = h2
   j['interfaces']['eth2']['mac_address'] = ten
   j['interfaces']['eth3']['mac_address'] = inc_mac(ten)
 

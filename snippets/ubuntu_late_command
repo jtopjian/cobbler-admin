@@ -125,5 +125,7 @@
 
     #set ssh = "in-target mkdir /root/.ssh; in-target wget http://%s/config/ssh_keys -O /root/.ssh/authorized_keys" % (srv)
 
+    #set static_command += "; in-target apt-get remove --purge -y biosdevname"
+
 d-i preseed/late_command string $nopxe; $static_command; $puppet_install; $location; $aptcache; $folsom; $ssh; $runpost; 
 #end if
