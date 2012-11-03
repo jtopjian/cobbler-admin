@@ -1,0 +1,245 @@
+{
+  "depth": 2,
+  "virt_ram": "<<inherit>>",
+  "monit_enabled": false,
+  "power_pass": "",
+  "redhat_management_key": "<<inherit>>",
+  "comment": "",
+  "redhat_management_server": "<<inherit>>",
+  "virt_file_size": "<<inherit>>",
+  "name_servers_search": [
+
+  ],
+  "status": "production",
+  "power_id": "",
+  "ipv6_default_device": "",
+  "netboot_enabled": true,
+  "boot_files": {
+  },
+  "template_remote_kickstarts": 0,
+  "ldap_type": "authconfig",
+  "hostname": "dair-us-c09.dair-atir.canarie.ca",
+  "mgmt_parameters": "<<inherit>>",
+  "uid": "MTMzNzI4ODk2MC4wNTQxODAyMzcuMDUzOTk",
+  "kernel_options": {
+  },
+  "kickstart": "<<inherit>>",
+  "repos_enabled": false,
+  "image": "",
+  "kernel_options_post": {
+  },
+  "ldap_enabled": false,
+  "mgmt_classes": [
+
+  ],
+  "power_type": "ether_wake",
+  "power_user": "",
+  "name": "dair-us-c09",
+  "proxy": "<<inherit>>",
+  "ipv6_autoconfiguration": false,
+  "gateway": "192.168.44.10",
+  "mtime": 1351897366.80234,
+  "owners": [
+    "admin"
+  ],
+  "fetchable_files": {
+  },
+  "interfaces": {
+    "eth1": {
+      "bonding_master": "",
+      "ip_address": "192.168.4.19",
+      "dhcp_tag": "",
+      "static_routes": [
+
+      ],
+      "interface_type": "",
+      "mtu": "",
+      "bonding": "",
+      "ipv6_default_gateway": "",
+      "management": false,
+      "mac_address": "00:26:6c:f9:7b:05",
+      "netmask": "255.255.255.0",
+      "bonding_opts": "",
+      "dns_name": "",
+      "virt_bridge": "virbr0",
+      "bridge_opts": "",
+      "ipv6_address": "",
+      "static": true,
+      "ipv6_mtu": "",
+      "ipv6_secondaries": [
+
+      ],
+      "interface_master": "",
+      "subnet": "",
+      "ipv6_static_routes": [
+
+      ]
+    },
+    "eth0": {
+      "ip_address": "192.168.4.19",
+      "bonding_master": "",
+      "static_routes": [
+
+      ],
+      "dhcp_tag": "",
+      "ipv6_default_gateway": "",
+      "bonding": "",
+      "mtu": "",
+      "interface_type": "",
+      "dns_name": "",
+      "bonding_opts": "",
+      "netmask": "255.255.255.0",
+      "mac_address": "00:26:6c:f9:7b:04",
+      "management": false,
+      "bridge_opts": "",
+      "virt_bridge": "virbr0",
+      "static": true,
+      "ipv6_address": "",
+      "ipv6_secondaries": [
+
+      ],
+      "ipv6_mtu": "",
+      "interface_master": "",
+      "subnet": "",
+      "ipv6_static_routes": [
+
+      ]
+    },
+    "eth2": {
+      "ip_address": "",
+      "bonding_master": "",
+      "static_routes": [
+
+      ],
+      "dhcp_tag": "",
+      "ipv6_default_gateway": "",
+      "bonding": "",
+      "mtu": "",
+      "interface_type": "bond_slave",
+      "dns_name": "",
+      "bonding_opts": "",
+      "netmask": "",
+      "mac_address": "00:26:6c:f9:64:ac",
+      "management": false,
+      "bridge_opts": "",
+      "virt_bridge": "virbr0",
+      "static": false,
+      "ipv6_address": "",
+      "ipv6_secondaries": [
+
+      ],
+      "ipv6_mtu": "",
+      "interface_master": "bond0",
+      "subnet": "",
+      "ipv6_static_routes": [
+
+      ]
+    },
+    "bond0": {
+      "ip_address": "",
+      "bonding_master": "",
+      "static_routes": [
+
+      ],
+      "dhcp_tag": "",
+      "ipv6_default_gateway": "",
+      "bonding": "",
+      "mtu": "",
+      "interface_type": "bond",
+      "dns_name": "",
+      "bonding_opts": "",
+      "netmask": "",
+      "mac_address": "",
+      "management": false,
+      "bridge_opts": "",
+      "virt_bridge": "virbr0",
+      "static": false,
+      "ipv6_address": "",
+      "ipv6_secondaries": [
+
+      ],
+      "ipv6_mtu": "",
+      "interface_master": "",
+      "subnet": "",
+      "ipv6_static_routes": [
+
+      ]
+    },
+    "eth3": {
+      "ip_address": "",
+      "bonding_master": "",
+      "static_routes": [
+
+      ],
+      "dhcp_tag": "",
+      "ipv6_default_gateway": "",
+      "bonding": "",
+      "mtu": "",
+      "interface_type": "bond_slave",
+      "dns_name": "",
+      "bonding_opts": "",
+      "netmask": "",
+      "mac_address": "00:26:6c:f9:64:ad",
+      "management": false,
+      "bridge_opts": "",
+      "virt_bridge": "virbr0",
+      "static": false,
+      "ipv6_address": "",
+      "ipv6_secondaries": [
+
+      ],
+      "ipv6_mtu": "",
+      "interface_master": "bond0",
+      "subnet": "",
+      "ipv6_static_routes": [
+
+      ]
+    },
+    "vlan11": {
+      "ip_address": "192.168.44.19",
+      "bonding_master": "",
+      "static_routes": [
+
+      ],
+      "dhcp_tag": "",
+      "ipv6_default_gateway": "",
+      "bonding": "",
+      "mtu": "",
+      "interface_type": "",
+      "dns_name": "dair-us-c09.dair-atir.canarie.ca",
+      "bonding_opts": "",
+      "netmask": "255.255.255.0",
+      "mac_address": "00:16:3e:40:df:19",
+      "management": true,
+      "bridge_opts": "",
+      "virt_bridge": "virbr0",
+      "static": true,
+      "ipv6_address": "",
+      "ipv6_secondaries": [
+
+      ],
+      "ipv6_mtu": "",
+      "interface_master": "",
+      "subnet": "",
+      "ipv6_static_routes": [
+
+      ]
+    }
+  },
+  "profile": "Rescue",
+  "virt_cpus": "<<inherit>>",
+  "name_servers": [
+    "192.168.4.235"
+  ],
+  "ctime": 1337288960.04964,
+  "virt_auto_boot": 0,
+  "virt_path": "<<inherit>>",
+  "ks_meta": {
+  },
+  "server": "<<inherit>>",
+  "virt_disk_driver": "<<inherit>>",
+  "power_address": "",
+  "virt_type": "xenpv",
+  "template_files": {
+  }
+}
