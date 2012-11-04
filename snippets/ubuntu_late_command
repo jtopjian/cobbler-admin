@@ -112,7 +112,7 @@
     #end if
 
     #if $puppet in [ "1", "true", "yes", "y" ]
-        #set puppet_install = "in-target apt-get install -y puppet git; in-target wget http://%s/config/puppet.conf -O /etc/puppet/puppet.conf; in-target wget http://%s/config/puppet-bootstrap.pp -O /etc/puppet/puppet-bootstrap.pp; in-target git clone https://github.com/puppetlabs/puppetlabs-apt /etc/puppet/modules/apt; in-target git clone -b 3.x https://github.com/puppetlabs/puppetlabs-stdlib /etc/puppet/modules/stdlib; in-target puppet apply /etc/puppet/puppet-bootstrap.pp" % (srv, srv)
+        #set puppet_install = "in-target apt-get install -y puppet git; in-target wget http://%s/config/puppet.conf -O /etc/puppet/puppet.conf; in-target wget http://%s/config/puppet.default -O /etc/default/puppet; in-target wget http://%s/config/puppet-bootstrap.pp -O /etc/puppet/puppet-bootstrap.pp; in-target git clone https://github.com/puppetlabs/puppetlabs-apt /etc/puppet/modules/apt; in-target git clone -b 3.x https://github.com/puppetlabs/puppetlabs-stdlib /etc/puppet/modules/stdlib; in-target puppet apply /etc/puppet/puppet-bootstrap.pp" % (srv, srv, srv)
     #else
         #set puppet_install = "echo 1"
     #end if
