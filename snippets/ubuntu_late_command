@@ -121,7 +121,7 @@
 
     #set aptcache = "in-target wget http://%s/config/01apt-cacher-ng-proxy -O /etc/apt/apt.conf.d/01apt-cacher-ng-proxy; in-target wget http://%s/config/sources.list -O /etc/apt/sources.list; in-target apt-get update" % (srv,srv)
 
-    #set folsom = "in-target apt-get install -y ubuntu-cloud-keyring; in-target wget http://%s/config/folsom.list -O /etc/apt/sources.list.d/folsom.list; in-target apt-get update" % (srv)
+    #set folsom = "in-target wget http://%s/config/folsom.list -O /etc/apt/sources.list.d/folsom.list; in-target apt-get update; in-target apt-get install -y ubuntu-cloud-keyring;" % (srv)
 
     #set ssh = "in-target mkdir /root/.ssh; in-target wget http://%s/config/ssh_keys -O /root/.ssh/authorized_keys" % (srv)
 
