@@ -1,0 +1,11 @@
+#set srv = $getVar('http_server','')
+d-i preseed/early_command string cd /tmp; wget http://$srv/dair/early_command_generic -O early_command; \
+	chmod 755 early_command; \
+	echo /tmp/early_command installer >> /var/lib/dpkg/info/download-installer.postinst;
+
+d-i netcfg/choose_interface select em1
+
+d-i netcfg/disable_dhcp boolean true
+d-i netcfg/get_hostname string $hostname
+d-i netcfg/get_domain string example.com
+d-i netcfg/wireless_wep string

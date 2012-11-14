@@ -20,7 +20,7 @@ logger server-farm.early_command partition configuration starting
 # Downloading parted, partprobe, and necessary libraries
 mkdir /tmp/setup
 cd /tmp/setup
-wget http://192.168.4.235/setup.tar
+wget http://192.168.22.101/setup.tar
 tar xf setup.tar
 export PATH=$PATH:/tmp/setup
 export LD_LIBRARY_PATH=/tmp/setup/lib
@@ -31,7 +31,7 @@ do
     mdadm --stop --force /dev/$i
 done
 
-# Cleaning partitions 
+# Cleaning partitions
 # Wiping software raid superblock
 for i in sda sdb sdc sdd
 do
@@ -51,24 +51,28 @@ parted --script /dev/sda mklabel gpt
 parted --script /dev/sdb mklabel gpt
 parted --script /dev/sdc mklabel gpt
 parted --script /dev/sdd mklabel gpt
+parted --script /dev/sde mklabel gpt
+parted --script /dev/sdf mklabel gpt
 parted --script /dev/sda mklabel msdos
 parted --script /dev/sdb mklabel msdos
 parted --script /dev/sdc mklabel msdos
 parted --script /dev/sdd mklabel msdos
+parted --script /dev/sde mklabel msdos
+parted --script /dev/sdf mklabel msdos
 
 # Partition info:
 # sda1 /boot 512mb (raid autodetect)
 # sda2 swap 20G (raid autodetect)
 # sda5 / rest (raid autodetect)
 # Sending commands that are normally interactive to fdisk
-for i in sda sdb sdc sdd
+for i in sda sdb sdc sdd sde sdf
 do
 echo "
 n
 p
 1
 
-+512M
++300M
 a
 1
 n
@@ -98,17 +102,6 @@ w
 " | fdisk /dev/$i
 done
 
-# Go back and add swap
-#for i in sdc sdd
-#do
-#echo "
-#t
-#2
-#82
-#w
-#" | fdisk /dev/$i
-#done
-
 # Using partprobe to re-read partition table of all three hard drives
 partprobe -s /dev/sda
 partprobe -s /dev/sdb
@@ -124,10 +117,10 @@ modprobe raid10
 echo y | mdadm -C /dev/md0 -n 2 -l raid1 --metadata=0.90 /dev/sda1 /dev/sdb1
 
 # Creating spare raid1
-echo y | mdadm -C /dev/md1 -n 2 -l raid1 --metadata=default /dev/sda2 /dev/sdb2 
+echo y | mdadm -C /dev/md1 -n 2 -l raid1 --metadata=default /dev/sda2 /dev/sdb2
 
 # Creating / raid10
-echo y | mdadm -C /dev/md2 -n 4 -l raid10 --metadata=default /dev/sda5 /dev/sdb5 /dev/sdc5 /dev/sdd5 
+echo y | mdadm -C /dev/md2 -n 6 -l raid10 /dev/sda5 /dev/sdb5 /dev/sdc5 /dev/sdd5 /dev/sde5 /dev/sdf5
 
 # Creating swap
 echo y | mdadm -C /dev/md3 -n 2 -l raid1 --metadata=default /dev/sdc2 /dev/sdd2

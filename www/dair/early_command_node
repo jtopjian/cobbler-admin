@@ -19,7 +19,7 @@ logger server-farm.early_command partition configuration starting
 # Downloading parted, partprobe, and necessary libraries
 mkdir /tmp/setup
 cd /tmp/setup
-wget http://192.168.4.235/setup.tar
+wget http://192.168.22.101/setup.tar
 tar xf setup.tar
 export PATH=$PATH:/tmp/setup
 export LD_LIBRARY_PATH=/tmp/setup/lib
