@@ -89,7 +89,7 @@
             #set hosts += "ff02::1 ip6-allnodes\\n"
             #set hosts += "ff02::2 ip6-allrouters\\n"
             #set static_command += "; echo -e \"%s\" > /target/etc/hosts" % (hosts)
-            #set static_command += "; echo -e \"%s\" > /target/etc/hostname" % (hosts)
+            #set static_command += "; echo -e \"%s\" > /target/etc/hostname" % (hostname)
         #end if
     #else
         #set static_command = "echo 1"
